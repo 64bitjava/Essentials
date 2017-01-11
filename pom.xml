@@ -25,7 +25,7 @@
     <repositories>
         <repository>
             <id>ess-repo</id>
-            <url>http://repo.ess3.net/content/groups/public</url>
+            <url>https://ci.drtshock.net/plugin/repository/everything/</url>
         </repository>
         <repository>
             <id>bukkit-repo</id>
@@ -46,14 +46,14 @@
         <module>nms/1_8_R1Provider</module>
         <module>nms/1_8_R2Provider</module>
         <module>nms/LegacyProvider</module>
-        <module>nms/1_9_R1Provider</module>
+        <module>nms/ReflectionProvider</module>
     </modules>
 
     <dependencies>
         <dependency>
             <groupId>org.bukkit</groupId>
             <artifactId>bukkit</artifactId>
-            <version>1.9-R0.1-SNAPSHOT</version>
+            <version>1.11-R0.1-SNAPSHOT</version>
             <scope>provided</scope>
         </dependency>
         <dependency>
@@ -266,7 +266,7 @@
     </build>
 
     <properties>
-        <build.number>TeamCity</build.number>
+        <build.number>SNAPSHOT</build.number>
         <GMVer>GMBuildVer</GMVer>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     </properties>

@@ -11,6 +11,7 @@ import org.bukkit.Color;
 import org.bukkit.DyeColor;
 import org.bukkit.FireworkEffect;
 import org.bukkit.Material;
+import org.bukkit.block.Banner;
 import org.bukkit.block.banner.PatternType;
 import org.bukkit.enchantments.Enchantment;
 import org.bukkit.inventory.ItemStack;
@@ -92,6 +93,10 @@ public class MetaItemStack {
         completePotion = true;
     }
 
+    private boolean isPotion(Material type) {
+        return type.name().endsWith("POTION");
+    }
+
     public boolean canSpawn(final IEssentials ess) {
         try {
             ess.getServer().getUnsafe().modifyItemStack(stack.clone(), "{}");
@@ -150,9 +155,14 @@ public class MetaItemStack {
         }
 
         Material banner = null;
+        Material shield = null;
 
         try {
+            // 1.8
             banner = Material.valueOf("BANNER");
+            
+            // 1.9
+            shield = Material.valueOf("SHIELD");
         } catch(IllegalArgumentException ignored){}
 
         if (split.length > 1 && split[0].equalsIgnoreCase("name") && hasMetaPermission(sender, "name", false, true, ess)) {
@@ -204,9 +214,11 @@ public class MetaItemStack {
             stack.setItemMeta(meta);
         } else if (stack.getType() == Material.FIREWORK) {//WARNING - Meta for fireworks will be ignored after this point.
             addFireworkMeta(sender, false, string, ess);
-        } else if (stack.getType() == Material.POTION) { //WARNING - Meta for potions will be ignored after this point.
+        } else if (isPotion(stack.getType())) { //WARNING - Meta for potions will be ignored after this point.
             addPotionMeta(sender, false, string, ess);
         } else if (banner != null && stack.getType() == banner) { //WARNING - Meta for banners will be ignored after this point.
+            addBannerMeta(sender, false, string, ess);
+        } else if (shield != null && stack.getType() == shield) { //WARNING - Meta for shields will be ignored after this point.
             addBannerMeta(sender, false, string, ess);
         } else if (split.length > 1 && (split[0].equalsIgnoreCase("color") || split[0].equalsIgnoreCase("colour")) && (stack.getType() == Material.LEATHER_BOOTS || stack.getType() == Material.LEATHER_CHESTPLATE || stack.getType() == Material.LEATHER_HELMET || stack.getType() == Material.LEATHER_LEGGINGS)) {
             final String[] color = split[1].split("(\\||,)");
@@ -310,7 +322,7 @@ public class MetaItemStack {
     }
 
     public void addPotionMeta(final CommandSource sender, final boolean allowShortName, final String string, final IEssentials ess) throws Exception {
-        if (stack.getType() == Material.POTION) {
+        if (isPotion(stack.getType())) {
             final String[] split = splitPattern.split(string, 2);
 
             if (split.length < 2) {
@@ -437,18 +449,50 @@ public class MetaItemStack {
             if (split.length < 2) {
                 throw new Exception(tl("invalidBanner", split[1]));
             }
+            
+            PatternType patternType = null;
+            try {
+                patternType = PatternType.valueOf(split[0]);
+            } catch (Exception ignored ) {}
 
             final BannerMeta meta = (BannerMeta) stack.getItemMeta();
             if (split[0].equalsIgnoreCase("basecolor")) {
                 Color color = Color.fromRGB(Integer.valueOf(split[1]));
                 meta.setBaseColor(DyeColor.getByColor(color));
-            } else if (PatternType.valueOf(split[0]) != null) {
+            } else if (patternType != null) {
                 PatternType type = PatternType.valueOf(split[0]);
                 DyeColor color = DyeColor.getByColor(Color.fromRGB(Integer.valueOf(split[1])));
                 org.bukkit.block.banner.Pattern pattern = new org.bukkit.block.banner.Pattern(color, type);
                 meta.addPattern(pattern);
             }
 
+            stack.setItemMeta(meta);
+        } else if (stack.getType() == Material.SHIELD && string != null) {
+            final String[] split = splitPattern.split(string, 2);
+
+            if (split.length < 2) {
+                throw new Exception(tl("invalidBanner", split[1]));
+            }
+
+            PatternType patternType = null;
+            try {
+                patternType = PatternType.valueOf(split[0]);
+            } catch (Exception ignored ) {}
+
+            // Hacky fix for accessing Shield meta - https://github.com/drtshock/Essentials/pull/745#issuecomment-234843795
+            BlockStateMeta meta = (BlockStateMeta) stack.getItemMeta();
+            Banner banner = (Banner) meta.getBlockState();
+            if (split[0].equalsIgnoreCase("basecolor")) {
+                Color color = Color.fromRGB(Integer.valueOf(split[1]));
+                banner.setBaseColor(DyeColor.getByColor(color));
+            } else if (patternType != null) {
+                PatternType type = PatternType.valueOf(split[0]);
+                DyeColor color = DyeColor.getByColor(Color.fromRGB(Integer.valueOf(split[1])));
+                org.bukkit.block.banner.Pattern pattern = new org.bukkit.block.banner.Pattern(color, type);
+                banner.addPattern(pattern);
+            }
+            banner.update();
+            meta.setBlockState(banner);
             stack.setItemMeta(meta);
         }
     }

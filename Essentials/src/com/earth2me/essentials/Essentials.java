@@ -24,6 +24,7 @@ import com.earth2me.essentials.register.payment.Methods;
 import com.earth2me.essentials.signs.SignBlockListener;
 import com.earth2me.essentials.signs.SignEntityListener;
 import com.earth2me.essentials.signs.SignPlayerListener;
+import com.earth2me.essentials.supervisor.EssentialsReportContext;
 import com.earth2me.essentials.textreader.IText;
 import com.earth2me.essentials.textreader.KeywordReplacer;
 import com.earth2me.essentials.textreader.SimpleTextInput;
@@ -38,13 +39,13 @@ import net.ess3.nms.PotionMetaProvider;
 import net.ess3.nms.SpawnEggProvider;
 import net.ess3.nms.SpawnerProvider;
 import net.ess3.nms.legacy.LegacyPotionMetaProvider;
+import net.ess3.nms.refl.ReflSpawnEggProvider;
 import net.ess3.nms.updatedmeta.BasePotionDataProvider;
 import net.ess3.nms.updatedmeta.BlockMetaSpawnerProvider;
 import net.ess3.nms.legacy.LegacySpawnEggProvider;
 import net.ess3.nms.legacy.LegacySpawnerProvider;
 import net.ess3.nms.v1_8_R1.v1_8_R1SpawnerProvider;
 import net.ess3.nms.v1_8_R2.v1_8_R2SpawnerProvider;
-import net.ess3.nms.v1_9_R1.v1_9_R1SpawnEggProvider;
 import net.ess3.providers.ProviderFactory;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
@@ -143,7 +144,6 @@ public class Essentials extends JavaPlugin implements net.ess3.api.IEssentials {
         
         LOGGER.log(Level.INFO, tl("usingTempFolderForTesting"));
         LOGGER.log(Level.INFO, dataFolder.toString());
-        this.initialize(null, server, new PluginDescriptionFile(new FileReader(new File("src" + File.separator + "plugin.yml"))), dataFolder, null, null);
         settings = new Settings(this);
         userMap = new UserMap(this);
         permissionsHandler = new PermissionsHandler(this, false);
@@ -194,7 +194,6 @@ public class Essentials extends JavaPlugin implements net.ess3.api.IEssentials {
                 execTimer.mark("Init(Usermap)");
                 upgrade.afterSettings();
                 execTimer.mark("Upgrade2");
-                i18n.updateLocale(settings.getLocale());
                 warps = new Warps(getServer(), this.getDataFolder());
                 confList.add(warps);
                 execTimer.mark("Init(Spawn/Warp)");
@@ -214,7 +213,7 @@ public class Essentials extends JavaPlugin implements net.ess3.api.IEssentials {
                         ), "mob spawner").getProvider();
                 spawnEggProvider = new ProviderFactory<>(getLogger(),
                         Arrays.asList(
-                                v1_9_R1SpawnEggProvider.class,
+                                ReflSpawnEggProvider.class,
                                 LegacySpawnEggProvider.class
                         ), "spawn egg").getProvider();
                 potionMetaProvider = new ProviderFactory<>(getLogger(),
@@ -259,6 +258,10 @@ public class Essentials extends JavaPlugin implements net.ess3.api.IEssentials {
                 // Failed to submit the stats :-(
             }
 
+            if (getServer().getPluginManager().getPlugin("Supervisor") != null) {
+                EssentialsReportContext.load(this);
+            }
+
             final String timeroutput = execTimer.end();
             if (getSettings().isDebug()) {
                 LOGGER.log(Level.INFO, "Essentials load {0}", timeroutput);
@@ -283,9 +286,9 @@ public class Essentials extends JavaPlugin implements net.ess3.api.IEssentials {
             LOGGER.log(Level.INFO, "Registering Listeners");
         }
 
-        final EssentialsPluginListener serverListener = new EssentialsPluginListener(this);
-        pm.registerEvents(serverListener, this);
-        confList.add(serverListener);
+        final EssentialsPluginListener pluginListener = new EssentialsPluginListener(this);
+        pm.registerEvents(pluginListener, this);
+        confList.add(pluginListener);
 
         final EssentialsPlayerListener playerListener = new EssentialsPlayerListener(this);
         pm.registerEvents(playerListener, this);
@@ -307,6 +310,9 @@ public class Essentials extends JavaPlugin implements net.ess3.api.IEssentials {
 
         final EssentialsWorldListener worldListener = new EssentialsWorldListener(this);
         pm.registerEvents(worldListener, this);
+
+        final EssentialsServerListener serverListener = new EssentialsServerListener(this);
+        pm.registerEvents(serverListener, this);
 
         pm.registerEvents(tntListener, this);
 

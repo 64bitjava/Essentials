@@ -30,6 +30,12 @@ public class BasePotionDataProvider extends PotionMetaProvider {
 
     @Override
     public ItemStack createPotionItem(Material initial, int effectId) throws IllegalArgumentException {
+        ItemStack potion = new ItemStack(initial, 1);
+
+        if (effectId == 0) {
+            return potion;
+        }
+
         int damageValue = getBit(effectId, 0) +
                 2 * getBit(effectId, 1) +
                 4 * getBit(effectId, 2) +
@@ -44,12 +50,8 @@ public class BasePotionDataProvider extends PotionMetaProvider {
         boolean upgraded = getBit(effectId, 5) == 1;
         boolean splash = getBit(effectId, 14) == 1;
 
-        ItemStack potion;
-
         if (splash && initial == Material.POTION) {
             potion = new ItemStack(Material.SPLASH_POTION, 1);
-        } else {
-            potion = new ItemStack(initial, 1);
         }
 
         PotionMeta meta = (PotionMeta) potion.getItemMeta();

@@ -2,15 +2,15 @@
 name: Essentials
 main: com.earth2me.essentials.Essentials
 # Note to developers: This next line cannot change, or the automatic versioning system will break.
-version: ${project.version}-b${BUILD_NUMBER}
+version: ${project.version}-b${build.number}
 website: http://tiny.cc/EssentialsCommands
 description: Provides an essential, core set of commands for Bukkit.
-softdepend: [Vault]
-authors: [Zenexer, ementalo, Aelux, Brettflan, KimKandor, snowleo, ceulemans, Xeology, KHobbits, md_5, Iaccidentally, drtshock, vemacs]
+softdepend: [Vault, Supervisor]
+authors: [Zenexer, ementalo, Aelux, Brettflan, KimKandor, snowleo, ceulemans, Xeology, KHobbits, md_5, Iaccidentally, drtshock, vemacs, SupaHam]
 commands:
   afk:
     description: Marks you as away-from-keyboard.
-    usage: /<command> [player]
+    usage: /<command> [player/message...]
     aliases: [eafk,away,eaway]
   antioch:
     description: 'A little surprise for operators.'
@@ -279,6 +279,14 @@ commands:
     description: Pays another player from your balance.
     usage: /<command> <player> <amount>
     aliases: [epay]
+  paytoggle:
+    description: Toggles whether you are accepting payments.
+    usage: /<command>
+    aliases: [epaytoggle, payoff, epayoff, payon, epayon]
+  payconfirmtoggle:
+    description: Toggles whether you are prompted to confirm payments.
+    usage: /<command>
+    aliases: [epayconfirmtoggle, payconfirmoff, epayconfirmoff, payconfirmon, epayconfirmon, payconfirm, epayconfirm]
   ping:
     description: Pong!
     usage: /<command>

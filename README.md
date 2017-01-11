@@ -1,6 +1,6 @@
-![](https://i.imgur.com/mwJjTRw.png)
+![](https://i.imgur.com/CP4SZpB.png)
 
-[![Downloads](http://i.imgur.com/MNr6OTb.png)](https://ci.drtshock.net/job/EssentialsX)
+[![Downloads](https://i.imgur.com/MMc0PJY.png)](https://ci.drtshock.net/job/EssentialsX)
 
 This is a fork of Essentials called EssentialsX.
 
@@ -30,6 +30,7 @@ Because EssentialsX builds against the Spigot/CraftBukkit server software for le
 java -jar BuildTools.jar --rev 1.8
 java -jar BuildTools.jar --rev 1.8.3
 java -jar BuildTools.jar --rev 1.9
+java -jar BuildTools.jar --rev 1.9.4
 ```
 
 Then, to build with Maven, use the command
